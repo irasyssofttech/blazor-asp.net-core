@@ -1,8 +1,14 @@
-# blazor-asp.net-core
-Project to give an overview of Blazor client side code interaction with ASP.NET Core API.
+# Blazor-ASP.NET-Core
+
+Project to give an overview of Blazor Client Side code interaction with ASP.NET Core API.
+
+ 
 
 # Blazor Client Side
-We use blazore client side architecture to create the UI. And getting the JSON data from API and manipulate that data in client side code.
+
+Used Blazor client side architecture to create the UI. Getting the JSON data from the API and manipulating that data into client side code.
+ 
 
 # ASP.NET Core API
-This ASP.NET Core API is used to interact with SQL Server database and get the data from database and also manipulate the business logic in servie layrer. Internally we are following semi repository pattern architecture.
+
+ASP.NET Core API is used to interact with SQL Server database to fetch the data from the database and also manipulated the business logic in service layer. Internally, following semi repository pattern architecture.
