@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomDYOClient", "CustomDYOClient\CustomDYOClient.csproj", "{8B228889-BBF7-41C8-8FAF-A6E952F54745}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C} = {9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomDYO.Api", "CustomDYO.Api\CustomDYO.Api.csproj", "{9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8B228889-BBF7-41C8-8FAF-A6E952F54745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B228889-BBF7-41C8-8FAF-A6E952F54745}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B228889-BBF7-41C8-8FAF-A6E952F54745}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B228889-BBF7-41C8-8FAF-A6E952F54745}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9259F33A-CDC8-4E7A-8D9F-7050DDEBF12C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AD7926C4-9DA6-46F7-A0E0-63253B064C58}
+	EndGlobalSection
+EndGlobal

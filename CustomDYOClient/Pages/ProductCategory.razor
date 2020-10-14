@@ -1,0 +1,326 @@
+﻿@page "/productcategory"
+@using System.Net.Http
+@inject HttpClient Http
+@inherits ProductCategoryBase
+@using CustomDYOClient.Services
+@using BlazorInputFile
+@inject IJSRuntime jsRuntime
+
+<section>
+    @if (Saved == true)
+    {
+        <div class="form-control alert @StatusClass">@Message<i class="close"></i></div>
+    }
+
+<div class="row">
+    <div class="col-md-2">
+        <input type="button" class="form-control btn btn-primary" @onclick="@ResetForm" value="Add New" />
+
+    </div>
+    <div class="col-md-2">
+        <input type="button" class="form-control btn btn-primary" @onclick="@DeleteCategory" value="Bulk Delete" />
+
+    </div>
+</div>
+    <hr />
+
+    <section style="display:flex;">
+
+        <div style="width:29%; padding:2px; margin-right:10px;">
+            <EditForm Model="@Category" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                <DataAnnotationsValidator />
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <InputSelect ValueExpression="@(()=>StaticDropG)"
+                                     Value="@StaticDropG"
+                                     ValueChanged="@((string value) => GetAdminUser(value))" disabled="@IsDisabled" class="form-control" style="border:1px solid black; width:100%;">
+                            <option selected value="-1">select one</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Factory">Factory</option>
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-6">
+                        <InputSelect ValueExpression="@(()=>CustomerID)"
+                                     Value="@CustomerID"
+                                     ValueChanged="@((string value) => GetParentCategory(value))" disabled="@IsDisabled" class="form-control" style="border:1px solid black; width:100%;">
+                            <option selected value="-1">select one</option>
+                            @if (AdminUser != null)
+                            {
+                                @foreach (var user in AdminUser)
+                                {
+                                    <option value="@user.Id">@user.CompanyName</option>
+                                }
+                            }
+                        </InputSelect>
+                        <ValidationMessage class="offset-sm-3 col-sm-8" For="@(() => CustomerID)" />
+
+
+                    </div>
+
+                </div>
+                <br />
+                <h6>Add Category</h6>
+                <div class="row">
+
+                    <div class="col-md-12" style="padding-top:5px;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                Product Name
+                            </div>
+                            <div class="col-md-12">
+                                <InputText id="CatName" type="text" @bind-Value="Category.CatagoryName" class="form-control"></InputText>
+                                <ValidationMessage class="offset-sm-3 col-sm-8" For="@(() => Category.CatagoryName)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="padding-top:5px;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                Parent Category
+                            </div>
+                            <div class="col-md-12">
+                                <InputSelect ValueExpression="@(()=>ParentID)"
+                                             Value="@ParentID"
+                                             ValueChanged="@((string value) => GetParentID(value))" class="form-control" style="border:1px solid black; width:100%;">
+                                    <option selected value="-1">select one</option>
+                                    @if (parentcategory != null)
+                                    {
+                                        @foreach (var Parent in parentcategory)
+                                        {
+                                            <option value="@Parent.ProductCatagoryId">@Parent.CatagoryName</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="padding-top:10px;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                Category Description
+                            </div>
+                            <div class="col-md-12">
+                                <InputTextArea id="CateDescptn" type="text" @bind-Value="Category.CatagoryDisplay" class="form-control" cols="3" rows="3" />
+                                <ValidationMessage class="offset-sm-3 col-sm-8" For="@(() => Category.CatagoryDisplay)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="padding-top:10px;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                ThumbNail
+                            </div>
+                            <div class="col-md-12">
+
+                                <div class="row">
+                                    <div class="col-12 p-0">
+                                        <div class="dropzone @dropClass rounded">
+                                            <InputFile id="fileInput" multiple title=""
+                                                       OnChange="HandleFileInputChange"
+                                                       accept="image/png,image/gif,image/jpeg"
+                                                       @ondragenter="HandleDragEnter"
+                                                       @ondragleave="HandleDragLeave" />
+                                            Upload images
+                                        </div>
+                                        @if ((fileTypeError || fileSizeError))
+                                        {
+                                            <ul class="validation-errors mb-0">
+                                                @if (fileTypeError)
+                                                {
+                                                    <li class="validation-message">Only image files are accepted.</li>
+                                                }
+                                                @if (fileSizeError)
+                                                {
+                                                    <li class="validation-message">The max file size is @MaxFileSizeMB MB.</li>
+                                                }
+                                            </ul>
+                                        }
+                                        @if (selectedFiles != null && selectedFiles.Count > 0)
+                                        {
+                                            <div class="col-12">
+                                                <ul>
+                                                    @foreach (var file in selectedFiles)
+                                                    {
+                                                        <li>
+                                                            @file.Name
+                                                            <button class="btn btn-link text-danger p-0 pl-1" type="button"
+                                                                    @onclick="@(e => RemoveFile(file))">
+                                                                <small class="align-text-bottom">Remove</small>
+                                                            </button>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+
+                                <img src="@imageDataURL" style="width:50px; height:50px;" />
+
+                                <ValidationMessage class="offset-sm-3 col-sm-8" For="@(() => Category.IconFilePath)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class=" col-md-12" style="padding-top:15px;">
+                        <button type="submit" class="btn btn-primary form-control">Save Category</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+        <div style="width: 68%; margin:2px 2px 2px 2px;">
+            <div class=" row">
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table" style="overflow:scroll">
+                        <thead style="background-color:dimgrey; color:white;">
+                            <tr>
+                                <th></th>
+                                <th>Select</th>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Count</th>
+                                <th>Edit</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (MainCategory != null)
+                            {
+                                @foreach (var mainCtgy in MainCategory)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td><input type="checkbox"  @onchange="eventArgs =>{ CheckedChnaged(mainCtgy.MainCtgyId); }" /></td>
+                                        <td><img src="@mainCtgy.MainCtgyPath" style="width:30px; height:30px;"></td>
+                                        <td>@mainCtgy.MainCtgyName</td>
+                                        <td>@mainCtgy.MainCtgyDcpn</td>
+                                        <td>0</td>
+                                        <td><input type="button" @onclick="@((args) => EditCategory(mainCtgy.MainCtgyId))" value="Edit" class="form-control btn btn-block" /></td>
+                                    </tr>
+                                    @foreach (var _Ctgy in mainCtgy._Category)
+                                    {
+                                        if (@_Ctgy._CtgyId > 0)
+                                        {
+                                            <tr>
+                                                <td>_</td>
+                                                <td><input type="checkbox" @onchange="eventArgs =>{ CheckedChnaged(_Ctgy._CtgyId); }" /></td>
+                                                <td><img src="@_Ctgy._CtgyPath" style="width:30px; height:30px;"></td>
+                                                <td>@_Ctgy._CtgyName</td>
+                                                <td>@_Ctgy._CtgyDcpn</td>
+                                                <td>0</td>
+                                                <td><input type="button" @onclick="@((args) => EditCategory(@_Ctgy._CtgyId))" value="Edit" class="form-control btn btn-block" /></td>
+                                            </tr>
+                                            @foreach (var __Ctgy in _Ctgy.__Category)
+                                            {
+                                                if (@__Ctgy.__CtgyId > 0)
+                                                {
+                                                    <tr>
+                                                        <td>__</td>
+                                                        <td><input type="checkbox" @onchange="eventArgs =>{ CheckedChnaged(__Ctgy.__CtgyId); }" /></td>
+                                                        <td><img src="@__Ctgy.__CtgyPath" style="width:30px; height:30px;"></td>
+                                                        <td>@__Ctgy.__CtgyName</td>
+                                                        <td>@__Ctgy.__CtgyDcpn</td>
+                                                        <td>0</td>
+                                                        <td><input type="button" @onclick="@((args) => EditCategory(@__Ctgy.__CtgyId))" value="Edit" class="form-control btn btn-block" /></td>
+                                                    </tr>
+                                                              @foreach (var ___Ctgy in __Ctgy.___Category)
+                                                                {
+                                                                    if (@___Ctgy.___CtgyId > 0)
+                                                                    {
+                                                                        <tr>
+                                                                        <td>___</td>
+                                                                        <td><input type="checkbox" @onchange="eventArgs =>{ CheckedChnaged(___Ctgy.___CtgyId); }" /></td>
+                                                                        <td><img src="@___Ctgy.___CtgyPath" style="width:30px; height:30px;"></td>
+                                                                        <td>@___Ctgy.___CtgyName</td>
+                                                                        <td>@___Ctgy.___CtgyDcpn</td>
+                                                                        <td>0</td>
+                                                                        <td><input type="button" @onclick="@((args) => EditCategory(@___Ctgy.___CtgyId))" value="Edit" class="form-control btn btn-block" /></td>
+                                                                        </tr>
+                                                                    }
+                                                               }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</section>
+
+@code {
+    const int MaxFileSizeMB = 5;
+    const int MaxFileSize = MaxFileSizeMB * 1024 * 1024; // 5MB
+    private string dropClass = "";
+    private bool fileSizeError = false;
+    private bool fileTypeError = false;
+    private List<IFileListEntry> selectedFiles = new List<IFileListEntry>();
+
+
+    private void HandleDragEnter()
+    {
+        dropClass = "dropzone-drag";
+    }
+
+    private void HandleDragLeave()
+    {
+        dropClass = "";
+    }
+
+    private async Task HandleFileInputChange(IFileListEntry[] files)
+    {
+        dropClass = "";
+        fileSizeError = false;
+        fileTypeError = false;
+        List<string> acceptedFileTypes = new List<string>() { "image/png", "image/jpeg", "image/gif" };
+        if (files != null)
+        {
+            foreach (var file in files)
+            {
+                bool error = false;
+                if (file.Size > MaxFileSize)
+                {
+                    error = true;
+                    fileSizeError = true;
+                }
+
+                if (!acceptedFileTypes.Contains(file.Type))
+                {
+                    error = true;
+                    fileTypeError = true;
+                }
+
+                //keep the good files
+                if (!error)
+                {
+                    selectedFiles.Add(file);
+                    var ms = new MemoryStream();
+                    await file.Data.CopyToAsync(ms);
+                    var reader = new StreamReader(file.Data);
+                    string imageBase64Data = Convert.ToBase64String(ms.ToArray());
+                    imageDataURL = string.Format("data:image/png;base64,{0}", imageBase64Data);
+                }
+            }
+        }
+    }
+
+    private void RemoveFile(IFileListEntry file)
+    {
+        selectedFiles.Remove(file);
+    }
+}
